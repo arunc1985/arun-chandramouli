@@ -1,0 +1,93 @@
+'''
+    This module contains all the Python Utils for re-usable code.
+'''
+import json
+from elasticsearch import Elasticsearch
+
+class JsonOperator:
+
+    @staticmethod
+    def readJson(json_file):
+        '''
+            Read the Json file and return the contents
+            :param json_file: Fullpath of the json file
+            :return: Json file contents as-is
+            :exception: Raise Error
+        '''
+        try:
+            with open(json_file,'r') as reader:
+                return json.load(reader)
+        except Exception as error:
+            raise Exception("Unable to read Json file - {} ".format(json_file))
+
+class ESOperator:
+
+    @staticmethod
+    def esConnection(es_host,es_port):
+        ''' 
+            Create a new Elasticsearch connection object & return
+            :param: es_host: Host VM IP where Elasticsearch is deployed
+            :param: es_port: Port on which Elasticsearch is deployed
+            :return: Elasticsearch connection object
+            :exception: Raise Error
+        '''
+        try:
+            es_conn_object = Elasticsearch([{'host': es_host, 'port': es_port}])
+            return es_conn_object
+        except Exception as error:
+            raise Exception("Unable to create an Elasticsearch connection object - {} {} ".format(es_host,es_port))
+
+    @staticmethod
+    def bulkUploadJson(es_conn_object,es_index,json_file_contents):
+        '''
+            Do a bulk upload of JSON file contents into Elasticsearch
+            :param: es_conn_object: Elasticsearch connection object
+            :param: es_index: Elasticsearch index into which records are to be pushed
+            :param: json_file_contents: Contents of User's json file
+            :return: True
+            :exception: Raise Error
+        '''
+        try:
+            es_conn_object.index(index=es_index, ignore=400, doc_type='bmi',body=json_file_contents)
+            return True
+        except Exception as error:
+            raise Exception("Unable to do bulk upload to index - {} ".format(es_index))
+
+    @staticmethod
+    def deleteIndex(es_conn_object,es_index):
+        '''
+            Delete an existing index
+            :param: es_conn_object: Elasticsearch connection object
+            :param: es_index: Elasticsearch index into which records are to be pushed
+            :return: True
+            :exception: Raise Error
+        '''
+        try:
+            es_conn_object.indices.delete(index=es_index, ignore=[400, 404])
+            return True
+        except Exception as error:
+            raise Exception("Unable to delete index - {} ".format(es_index))
+
+class BMICalculator:
+
+    @staticmethod
+    def calculateBmi(bmiUsersJsonFileContents,bmiCatJsonFileContents):
+        '''
+            Given height and weight, calculate and return BMI
+            Formula 1 - BMI
+            BMI(kg/m2) = mass(kg) / height(m)2
+            Sample Record:
+                {"Gender": "Male", "HeightCm": 161, "WeightKg": 85 }
+            :param bmiUsersJsonFileContents: Contens of User's json with height,weight etc...
+            :param bmiCatJsonFileContents: Contents of the BMI Category Table
+            :return: Updated JSON with BMI Index, Category
+            :exception: Continue with default
+        '''
+        for each_record in bmiUsersJsonFileContents:
+            try:
+                # Calculate BMI and yield millions of Records
+                each_record['bmi']=round(each_record['WeightKg']/(each_record['HeightCm']/100)**2,2)
+                yield each_record
+            except Exception as error:
+                # On exception with any record, continue .. ## TODO - logStash ##
+                continue
