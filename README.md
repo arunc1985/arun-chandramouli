@@ -16,14 +16,27 @@ Given the following JSON data
     as the input with weight and height parameters of a person, we have to perform
     the following:
         
-        1) Calculate the BMI (Body Mass Index) using Formula 1, BMI Category and
-        Health risk from Table 1 of the person and add them as 3 new columns.
+        1) Calculate the BMI (Body Mass Index) using Formula 1, BMI Category and Health risk from Table 1 of the person 
+        and add them as 3 new columns.
         2) Count the total number of overweight people using ranges in the column BMI
-        Category of Table 1, check this is consistent programmatically and add any
-        other observations in the documentation.
-        3) Create build, tests to make sure the code is working as expected and this
-        can be added to an automation build / testing / deployment pipeline.
+        Category of Table 1, check this is consistent programmatically and add any other observations in the documentation.
+        3) Create build, tests to make sure the code is working as expected and this can be added to an 
+        automation build / testing / deployment pipeline.
 
+----------
+USE-CASES
+----------
+
+>
+    - Ability of the System to take user-inputs via a *json* file
+    - Ability of the System to parse the *json* file and load records in-memory
+    - Ability of the System to parse each record, refer to BMI Table and add details such as;
+        - BMI Category
+        - Health Risk
+    - Ability of the System to store modified records into an Elastic-search index
+    - Ability of the System to parse the calculated index and store all overweight people into new index
+    - Ability of the System to be deployed as Containers/PODS
+    - Ability of the System to process millions of records in an optimized manner
 
 ------------------------------
 FORMULAS FOR BMI CALCULATIONS
