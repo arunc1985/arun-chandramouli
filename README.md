@@ -15,7 +15,7 @@ Given the following JSON data
     
     as the input with weight and height parameters of a person, we have to perform
     the following:
-    >
+        
         1) Calculate the BMI (Body Mass Index) using Formula 1, BMI Category and
         Health risk from Table 1 of the person and add them as 3 new columns.
         2) Count the total number of overweight people using ranges in the column BMI
@@ -31,6 +31,16 @@ FORMULAS FOR BMI CALCULATIONS
 >
     BMI(kg/m2) = mass(kg) / height(m)2
 
+-------------------------
+BMI CALCULATIONS EXAMPLE
+-------------------------
+>
+
+    The BMI (Body Mass Index) in (kg/m2) is equal to the weight in kilograms (kg)
+    divided by your height in meters squared (m)2. 
+    For example, if you are 175cm (1.75m) in height and 75kg in weight, 
+        - you can calculate your BMI as follows: 
+            - 75kg/ (1.75m²) = 24.49kg/m²
 
 -----------------------------------
 BMI TABLE - CATEGORY - HEALTH RISK
