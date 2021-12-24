@@ -1,8 +1,12 @@
 
+docker network rm elastic
 docker network create elastic
 docker pull docker.elastic.co/elasticsearch/elasticsearch:7.16.2
-docker run --rm --name bmies --net elastic -p 127.0.0.1:9200:9200 -p 127.0.0.1:9300:9300 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:7.16.2
-
-
 docker pull docker.elastic.co/kibana/kibana:7.16.2
-docker run --name kib01-test --net elastic -p 127.0.0.1:5601:5601 -e "ELASTICSEARCH_HOSTS=http://localhost:9200" docker.elastic.co/kibana/kibana:7.16.2
+
+
+docker rm -f bmies bmikib
+
+docker run --rm -d --name bmies --net elastic -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:7.16.2
+docker run --rm -d --name bmikib --net elastic -p 5601:5601 -e "ELASTICSEARCH_HOSTS=http://bmies:9200" docker.elastic.co/kibana/kibana:7.16.2
+

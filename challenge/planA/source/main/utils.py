@@ -2,7 +2,7 @@
     This module contains all the Python Utils for re-usable code.
 '''
 import json
-from elasticsearch import Elasticsearch
+from elasticsearch import Elasticsearch, helpers
 
 class JsonOperator:
 
@@ -47,23 +47,61 @@ class ESOperator:
             :return: True
             :exception: Raise Error
         '''
-        try:
-            es_conn_object.index(index=es_index, ignore=400, doc_type='bmi',body=json_file_contents)
-            return True
+        def _yield_records():
+            # A simple function to yield records for ES format and fsater processing
+            for record in json_file_contents:
+                yield {
+                    "_index": es_index,
+                    "bmi": record,
+                    }
+        try:            
+            return helpers.bulk(es_conn_object,_yield_records())
         except Exception as error:
             raise Exception("Unable to do bulk upload to index - {} ".format(es_index))
 
     @staticmethod
-    def bulkReadJson(es_conn_object,es_index):
+    def bulkReadJson(es_conn_object,es_index,query={'bmi.cat':'ModerateObese'}):
         '''
             Return all records from a given index
             :param: es_conn_object: Elasticsearch connection object
             :param: es_index: Elasticsearch index into which records are to be pushed
             :return: Elasticsearch Index records
             :exception: Raise Error
-        '''        
+
+            Sample Query:
+            doc = {
+                'query': {
+                    'match' : {'bmi.healthRisk':'Medium risk'}
+               }
+            }           
+
+            doc = {
+                'query': {
+                    'match' : {'bmi.Gender':'Male'}
+               }
+            }           
+
+            doc = {
+                'query': {
+                    'match' : {'bmi.cat':'ModerateObese'}
+               }
+            }           
+
+            doc = {
+                'size' : 10000,
+                'query': {
+                    'match_all' : {}
+               }
+            }
+        '''
+        doc = {
+                'query': {
+                    'match' : query
+               }
+            }           
+
         try:
-            return es_conn_object.search(index=es_index, body={"query":{"match_all":{}}})
+            return es_conn_object.search(index=es_index, body=doc,doc_type='_doc')
         except Exception as error:
             raise error
 
@@ -77,7 +115,7 @@ class ESOperator:
             :exception: Raise Error
         '''
         try:
-            es_conn_object.indices.delete(index=es_index, ignore=[400, 404])
+            es_conn_object.indices.delete(index=es_index)
             return True
         except Exception as error:
             raise Exception("Unable to delete index - {} ".format(es_index))
@@ -106,6 +144,7 @@ class BMICalculator:
                     if bmi > cats['low'] and bmi < cats['high']:
                         return {'cat':cats['cat'],'healthRisk':cats['healthRisk']}
             except Exception as error:
+                print("error :: ",error)
                 return {}
 
         def process_recs():
@@ -118,5 +157,6 @@ class BMICalculator:
                     yield each_record
                 except Exception as error:
                     # On exception with any record, continue .. ## TODO - logStash ##
+                    print("error :: ",error)
                     continue
         return process_recs()
