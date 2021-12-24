@@ -54,6 +54,20 @@ class ESOperator:
             raise Exception("Unable to do bulk upload to index - {} ".format(es_index))
 
     @staticmethod
+    def bulkReadJson(es_conn_object,es_index):
+        '''
+            Return all records from a given index
+            :param: es_conn_object: Elasticsearch connection object
+            :param: es_index: Elasticsearch index into which records are to be pushed
+            :return: Elasticsearch Index records
+            :exception: Raise Error
+        '''        
+        try:
+            return es_conn_object.search(index=es_index, body={"query":{"match_all":{}}})
+        except Exception as error:
+            raise error
+
+    @staticmethod
     def deleteIndex(es_conn_object,es_index):
         '''
             Delete an existing index
@@ -83,11 +97,26 @@ class BMICalculator:
             :return: Updated JSON with BMI Index, Category
             :exception: Continue with default
         '''
-        for each_record in bmiUsersJsonFileContents:
+
+        # Function to Calculate the BMI Category and HealthRisk
+        # Note to Reader : The Reason for using Inner function is to avoid *External FAT Function Calls*
+        def calc_table(bmi):
             try:
-                # Calculate BMI and yield millions of Records
-                each_record['bmi']=round(each_record['WeightKg']/(each_record['HeightCm']/100)**2,2)
-                yield each_record
+                for cats in bmiCatJsonFileContents:
+                    if bmi > cats['low'] and bmi < cats['high']:
+                        return {'cat':cats['cat'],'healthRisk':cats['healthRisk']}
             except Exception as error:
-                # On exception with any record, continue .. ## TODO - logStash ##
-                continue
+                return {}
+
+        def process_recs():
+            for each_record in bmiUsersJsonFileContents:
+                try:
+                    # Calculate BMI and yield millions of Records
+                    each_record['bmi']=round(each_record['WeightKg']/(each_record['HeightCm']/100)**2,2)
+                    result_calc_table=calc_table(each_record['bmi'])
+                    each_record['cat'],each_record['healthRisk']=result_calc_table['cat'],result_calc_table['healthRisk']
+                    yield each_record
+                except Exception as error:
+                    # On exception with any record, continue .. ## TODO - logStash ##
+                    continue
+        return process_recs()
