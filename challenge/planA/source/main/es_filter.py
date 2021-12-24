@@ -25,11 +25,13 @@ if __name__ == "__main__":
         unset esIndex
         unset bmiCAT
         export bmiCatJsonFile=/home/intucell/tests/arun-chandramouli/challenge/planA/files/bmi_cat.json
-        export bmiUsersJsonFile=/home/intucell/tests/arun-chandramouli/challenge/planA/files/sample2.json
+        export bmiUsersJsonFile=/home/intucell/tests/arun-chandramouli/challenge/planA/files/sample1.json
         export esHost=localhost
         export esPort=9200
         export esIndex='bmi'
         export bmiCAT="OverWeight"
+        # {'query': {'match': {'bmi.cat':'OverWeight'}}}
+        # {'query': {'match_phrase': {"bmi.cat": {"query":"OverWeight"} }}}
     '''
     bmiUsersJsonFile=os.environ['bmiUsersJsonFile']
     bmiCatJsonFile=os.environ['bmiCatJsonFile']
@@ -37,6 +39,8 @@ if __name__ == "__main__":
     esPort=os.environ['esPort']    
     esIndex=os.environ['esIndex'] 
 
-    es_processor_ins_parser=ESDataFilter(esHost='localhost',esPort='9200')
+    es_processor_ins_parser=ESDataFilter(esHost=esHost,esPort=esPort)
     es_processor_ins_parser.getEsConnection()
-    es_processor_ins_parser.getRecordsFromIndex(es_index='bmi',query={'bmi.cat':'ModerateObese'})
+    
+    result=es_processor_ins_parser.getRecordsFromIndex(es_index=esIndex,query={'query': {'match_phrase': {"bmi.cat": {"query":"OverWeight"} }}})
+    print(result)

@@ -60,7 +60,7 @@ class ESOperator:
             raise Exception("Unable to do bulk upload to index - {} ".format(es_index))
 
     @staticmethod
-    def bulkReadJson(es_conn_object,es_index,query={'bmi.cat':'ModerateObese'}):
+    def bulkReadJson(es_conn_object,es_index,query):
         '''
             Return all records from a given index
             :param: es_conn_object: Elasticsearch connection object
@@ -88,20 +88,13 @@ class ESOperator:
             }           
 
             doc = {
-                'size' : 10000,
                 'query': {
                     'match_all' : {}
                }
             }
         '''
-        doc = {
-                'query': {
-                    'match' : query
-               }
-            }           
-
         try:
-            return es_conn_object.search(index=es_index, body=doc,doc_type='_doc')
+            return es_conn_object.search(index=es_index, body=query,doc_type='_doc')
         except Exception as error:
             raise error
 
