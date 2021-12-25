@@ -4,6 +4,7 @@
 import os
 from utils import ESOperator
 from common_bases import ESDataBase
+import json
 
 class ESDataFilter(ESDataBase):
     '''
@@ -16,31 +17,19 @@ class ESDataFilter(ESDataBase):
         '''
         return ESOperator.bulkReadJson(es_conn_object=self.esConnObj,es_index=es_index,query=query)
 
-if __name__ == "__main__":
-    '''
-        unset bmiUsersJsonFile
-        unset bmiCatJsonFile
-        unset esHost
-        unset esPort
-        unset esIndex
-        unset bmiCAT
-        export bmiCatJsonFile=/home/intucell/tests/arun-chandramouli/challenge/planA/files/bmi_cat.json
-        export bmiUsersJsonFile=/home/intucell/tests/arun-chandramouli/challenge/planA/files/sample1.json
-        export esHost=localhost
-        export esPort=9200
-        export esIndex='bmi'
-        export bmiCAT="OverWeight"
-        # {'query': {'match': {'bmi.cat':'OverWeight'}}}
-        # {'query': {'match_phrase': {"bmi.cat": {"query":"OverWeight"} }}}
-    '''
-    bmiUsersJsonFile=os.environ['bmiUsersJsonFile']
-    bmiCatJsonFile=os.environ['bmiCatJsonFile']
-    esHost=os.environ['esHost']    
-    esPort=os.environ['esPort']    
-    esIndex=os.environ['esIndex'] 
+class Filters:
 
-    es_processor_ins_parser=ESDataFilter(esHost=esHost,esPort=esPort)
-    es_processor_ins_parser.getEsConnection()
+    @staticmethod
+    def filter(esHost,esPort,esQuery):
+        '''
+            Parse Records & Upload to Elasticsearch Index(Bulk Upload)
+        '''
+        es_processor_ins_parser=ESDataFilter(esHost=esHost,esPort=esPort)
+        es_processor_ins_parser.getEsConnection()
+        es_processor_ins_parser.getRecordsFromIndex(es_index=esIndex,query=json.loads(esQuery))
+        return True
+
+if __name__ == "__main__":
+
+    Filters.filter(os.environ['esHost'],os.environ['esPort'],os.environ['ESQUERY'])
     
-    result=es_processor_ins_parser.getRecordsFromIndex(es_index=esIndex,query={'query': {'match_phrase': {"bmi.cat": {"query":"OverWeight"} }}})
-    print(result)

@@ -56,17 +56,6 @@ class ESDataUploader(ESDataBase):
         #ESOperator.deleteIndex(self.esConnObj,es_index=es_index)
         return ESOperator.bulkUploadJson(es_conn_object=self.esConnObj,es_index=es_index,json_file_contents=records)
 
-class ESDataParser(ESDataBase):
-    '''
-        This class deals with following tasks;
-        1. Parse the ElasticSearch Database Index according to given query and return results
-    '''
-    def getRecordsFromIndex(self,es_index,query):
-        '''
-            Get Records from an Index and return
-        '''
-        return ESOperator.bulkReadJson(es_conn_object=self.esConnObj,es_index=es_index,query=query)
-
 class Uploader:
 
     @staticmethod
@@ -77,30 +66,11 @@ class Uploader:
         procesor_ins=BMIProcessor(bmiUsersJsonFile,bmiCatJsonFile)
         procesor_ins.getFileContents()
         procesor_ins.getBMIValues()
-        es_processor_ins=ESDataUploader(esHost='localhost',esPort='9200')     
+        es_processor_ins=ESDataUploader(esHost=esHost,esPort=esPort)
         es_processor_ins.getEsConnection()
-        es_processor_ins.setRecordsBulk(es_index='bmi',records=list(procesor_ins.getBMIValues()))
+        es_processor_ins.setRecordsBulk(es_index=esIndex,records=list(procesor_ins.getBMIValues()))
         return True
 
 if __name__ == "__main__":
-    '''
-        unset bmiUsersJsonFile
-        unset bmiCatJsonFile
-        unset esHost
-        unset esPort
-        unset esIndex
-        unset bmiCAT
-        export bmiCatJsonFile=/home/intucell/tests/arun-chandramouli/challenge/planA/files/bmi_cat.json
-        export bmiUsersJsonFile=/home/intucell/tests/arun-chandramouli/challenge/planA/files/sample2.json
-        export esHost=localhost
-        export esPort=9200
-        export esIndex='bmi'
-        export bmiCAT="OverWeight"
-    '''
-    bmiUsersJsonFile=os.environ['bmiUsersJsonFile']
-    bmiCatJsonFile=os.environ['bmiCatJsonFile']
-    esHost=os.environ['esHost']    
-    esPort=os.environ['esPort']    
-    esIndex=os.environ['esIndex'] 
     # Upload Records
-    Uploader.upload(bmiUsersJsonFile,bmiCatJsonFile,esHost,esPort,esIndex)
+    Uploader.upload(os.environ['bmiUsersJsonFile'],os.environ['bmiCatJsonFile'],os.environ['esHost'],os.environ['esPort'],os.environ['esIndex'])
