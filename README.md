@@ -109,4 +109,20 @@ EXECUTION STEPS
 >
     Please run the module as follows to input the *json* file and receive the output
 
+
+    >
+        SET THE ENVIRONMENT VARIABLES        
+            unset bmiUsersJsonFile
+            unset bmiCatJsonFile
+            unset esHost
+            unset esPort
+            unset esIndex
+            unset bmiCAT
+            export bmiCatJsonFile=/home/intucell/tests/arun-chandramouli/challenge/planA/files/bmi_cat.json
+            export bmiUsersJsonFile=/home/intucell/tests/arun-chandramouli/challenge/planA/files/sample1.json
+            export esHost=localhost
+            export esPort=9200
+            export esIndex='bmi'
+            export bmiCAT="OverWeight"
+            export ESQUERY='{"query": {"match": {"bmi.cat":"OverWeight"}}}'
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
