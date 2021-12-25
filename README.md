@@ -220,24 +220,25 @@ EXECUTION STEPS - RUN APP TO GET RESULTS
         > curl -XPOST http://localhost:7777/api/v1.1/bmi/publish/ # Publish records to elasticsearch server(millions of records)
 
     echo "Run the below GET call to fetch records from Elasticsearch ... "
+    Note :: Before running queries as below, please visit kibana and goto index 'bmi' and get an idea of bmi attributes
         
         Example 1 : Find all OverWeight people
-        > curl -XGET http://localhost:7777/api/v1.1/bmi/filter/ -d 'esQuery={"query": {"match": {"bmi.cat":"OverWeight"}}}'
+        > curl -XGET http://localhost:7777/api/v1.1/bmi/filter/ -d 'esQuery={"query": {"match": {"bmi.cat":"OverWeight"}},"size": 100}'
 
         Example 2 : Find all NormalWeight people
-        > curl -XGET http://localhost:7777/api/v1.1/bmi/filter/ -d 'esQuery={"query": {"match": {"bmi.cat":"NormalWeight"}}}'
+        > curl -XGET http://localhost:7777/api/v1.1/bmi/filter/ -d 'esQuery={"query": {"match": {"bmi.cat":"NormalWeight"}},"size": 100}'
         
         Example 3 : Find all ModerateObese people
-        > curl -XGET http://localhost:7777/api/v1.1/bmi/filter/ -d 'esQuery={"query": {"match": {"bmi.cat":"ModerateObese"}}}' 
+        > curl -XGET http://localhost:7777/api/v1.1/bmi/filter/ -d 'esQuery={"query": {"match": {"bmi.cat":"ModerateObese"}},"size": 100}' 
 
         Example 4 : Find all UnderWeight people
-        > curl -XGET http://localhost:7777/api/v1.1/bmi/filter/ -d 'esQuery={"query": {"match": {"bmi.cat":"UnderWeight"}}}' 
+        > curl -XGET http://localhost:7777/api/v1.1/bmi/filter/ -d 'esQuery={"query": {"match": {"bmi.cat":"UnderWeight"}},"size": 100}' 
 
         Example 5 : Find all SevereObese people
-        > curl -XGET http://localhost:7777/api/v1.1/bmi/filter/ -d 'esQuery={"query": {"match": {"bmi.cat":"SevereObese"}}}' 
+        > curl -XGET http://localhost:7777/api/v1.1/bmi/filter/ -d 'esQuery={"query": {"match": {"bmi.cat":"SevereObese"}},"size": 100}' 
 
         Example 6 : Find all VerySevereObese people
-        > curl -XGET http://localhost:7777/api/v1.1/bmi/filter/ -d 'esQuery={"query": {"match": {"bmi.cat":"VerySevereObese"}}}' 
+        > curl -XGET http://localhost:7777/api/v1.1/bmi/filter/ -d 'esQuery={"query": {"match": {"bmi.cat":"VerySevereObese"}},"size": 100}' 
 
         Note : If you want to filter based on more fields, login to Kibana and refer to index named 'bmi'
 
