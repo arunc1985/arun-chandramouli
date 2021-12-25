@@ -102,27 +102,113 @@ ALGORITHM
 
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
----------------
-EXECUTION STEPS
----------------
+-----------------------------------------------
+EXECUTION STEPS - ENVIRONMENT BRINGUP MANUALLY
+-----------------------------------------------
 
 >
-    Please run the module as follows to input the *json* file and receive the output
+    Please run the following commands in an ORDER to bring-up Environment
+
+    ----------------
+    MANUAL EXECUTION
+    ----------------
+    echo "Clone the Source Code..."
+    cd /home/$USER
+    sudo rm -rf /home/$USER/tests/
+    sudo mkdir tests
+    git clone https://github.com/arunc1985/arun-chandramouli.git
+    cd /home/$USER
+    ls
+
+    echo "Install Docker Engine ... from https://docs.docker.com/engine/install/ubuntu/"
+
+    sudo groupadd docker
+    sudo usermod -aG docker $USER
+
+    sudo apt-get remove docker docker-engine docker.io containerd runc
+    sudo apt-get update
+    sudo apt-get install \
+        ca-certificates \
+        curl \
+        gnupg \
+        lsb-release
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+    echo \
+    "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
+      $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+    sudo apt-get update
+    sudo apt-get install docker-ce docker-ce-cli containerd.io
+    sudo docker run hello-world
 
 
-    >
-        SET THE ENVIRONMENT VARIABLES        
-            unset bmiUsersJsonFile
-            unset bmiCatJsonFile
-            unset esHost
-            unset esPort
-            unset esIndex
-            unset bmiCAT
-            export bmiCatJsonFile=/home/intucell/tests/arun-chandramouli/challenge/planA/files/bmi_cat.json
-            export bmiUsersJsonFile=/home/intucell/tests/arun-chandramouli/challenge/planA/files/sample1.json
-            export esHost=localhost
-            export esPort=9200
-            export esIndex='bmi'
-            export bmiCAT="OverWeight"
-            export ESQUERY='{"query": {"match": {"bmi.cat":"OverWeight"}}}'
+    echo "Create a Docker Network for maintaining all the Containers"
+    docker network rm elastic
+    docker network create elastic
+    docker pull docker.elastic.co/elasticsearch/elasticsearch:7.16.2
+    docker pull docker.elastic.co/kibana/kibana:7.16.2
+
+    echo "Kickoff Elasticsearch & Kibana Containers"
+    docker rm -f bmies bmikib
+    docker run --rm -d --name bmies --net elastic -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:7.16.2
+    docker run --rm -d --name bmikib --net elastic -p 5601:5601 -e "ELASTICSEARCH_HOSTS=http://bmies:9200" docker.elastic.co/kibana/kibana:7.16.2
+
+    echo "Build the Dockerfile for processing the application ..."
+
+    cd /home/$USER/tests/arun-chandramouli/challenge/planA/deployments
+    docker build -t bmicalc:v1.1 -f dockerfile .
+
+    echo "Running the Flask application with all environment variables ..."
+    docker rm -f bmicalcapp
+    docker run -d --rm --name bmicalcapp \
+        --net elastic \
+        -v /home/$USER/tests/arun-chandramouli/challenge/planA/:/tmp/bmi/ \
+        -e bmiCatJsonFile="/tmp/bmi/files/bmi_cat.json" \
+        -e bmiUsersJsonFile="/tmp/bmi/files/sample1.json" \
+        -e esHost="bmies" \
+        -e esPort="9200" \
+        -e esIndex="bmi" \
+        -e FLASKHOSTNAME="0.0.0.0" \
+        -e FLASKPORT="7777" \
+        -p 7777:7777 \
+        bmicalc:v1.1 \
+        python /tmp/bmi/source/main/driver.py
+
+
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+-----------------------------------------
+EXECUTION STEPS - RUN APP TO GET RESULTS
+-----------------------------------------
+
+> 
+    echo "Run the CURL Commands for Publishing and Filtering BMI Records ...""
+    
+        > curl -XGET http://localhost:7777/  # Tests-Hello World
+    
+    echo "Run the below POST call to send records to Elasticsearch ... "
+        > curl -XPOST http://localhost:7777/api/v1.1/bmi/publish/ # Publish records to elasticsearch server(millions of records)
+
+    echo "Run the below GET call to fetch records from Elasticsearch ... "
+        
+        Example 1 : Find all OverWeight people
+        > curl -XGET http://localhost:7777/api/v1.1/bmi/filter/ -d 'esQuery={"query": {"match": {"bmi.cat":"OverWeight"}}}'
+
+        Example 2 : Find all NormalWeight people
+        > curl -XGET http://localhost:7777/api/v1.1/bmi/filter/ -d 'esQuery={"query": {"match": {"bmi.cat":"NormalWeight"}}}'
+        
+        Example 3 : Find all ModerateObese people
+        > curl -XGET http://localhost:7777/api/v1.1/bmi/filter/ -d 'esQuery={"query": {"match": {"bmi.cat":"ModerateObese"}}}' 
+
+        Example 4 : Find all UnderWeight people
+        > curl -XGET http://localhost:7777/api/v1.1/bmi/filter/ -d 'esQuery={"query": {"match": {"bmi.cat":"UnderWeight"}}}' 
+
+        Example 5 : Find all SevereObese people
+        > curl -XGET http://localhost:7777/api/v1.1/bmi/filter/ -d 'esQuery={"query": {"match": {"bmi.cat":"SevereObese"}}}' 
+
+        Example 6 : Find all VerySevereObese people
+        > curl -XGET http://localhost:7777/api/v1.1/bmi/filter/ -d 'esQuery={"query": {"match": {"bmi.cat":"VerySevereObese"}}}' 
+
+        Note : If you want to filter based on more fields, login to Kibana and refer to index named 'bmi'
+
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *                      
