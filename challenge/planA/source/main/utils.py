@@ -108,7 +108,7 @@ class ESOperator:
             :exception: Raise Error
         '''
         try:
-            es_conn_object.indices.delete(index=es_index)
+            es_conn_object.indices.delete(index=es_index, ignore=[400,404])
             return True
         except Exception as error:
             raise Exception("Unable to delete index - {} ".format(es_index))
