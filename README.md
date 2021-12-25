@@ -3,9 +3,12 @@
 	SETUP PROGRAM TO BRING-UP THE ECOSYSTEM
 	
 	* * * The entire set-up is automated, but you only need to clone and run setup.sh file * * *
+
 	Please run the following steps in an order; (You must have ROOT Access)
 
-		sudo git clone https://github.com/arunc1985/arun-chandramouli.git
+		rm -rf /home/$USER/arun-chandramouli
+		rm -rf /home/$USER/tests
+		git clone https://github.com/arunc1985/arun-chandramouli.git
 		sudo chown -R $USER /home/$USER/arun-chandramouli
  		ls -la
 		cd arun-chandramouli
