@@ -138,6 +138,14 @@ NOTE ON SCALING & HIGH PERFORMANCE ELASTICSEARCH CLUSTER
     -   Please be informed that Elasticsearch can be configured for high-end systems also
         but that may not be the scope of this exercise.
 
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+------------------------------------------
+ACCESS T0 ELASTICSEARCH CLUSTER & KIBANA
+------------------------------------------
+
+    Elasticsearch: http://localhost:/9200 OR http://<<IP>>:/9200
+    Kibana: http://localhost:/5601 OR http://<<IP>>:/5601
 
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
