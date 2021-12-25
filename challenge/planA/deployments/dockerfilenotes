@@ -1,0 +1,39 @@
+>
+    echo "Create a Docker Network for maintaining all the Containers"
+    docker network rm elastic
+    docker network create elastic
+    docker pull docker.elastic.co/elasticsearch/elasticsearch:7.16.2
+    docker pull docker.elastic.co/kibana/kibana:7.16.2
+    echo "Kickoff Elasticsearch & Kibana Containers"
+    docker rm -f bmies bmikib
+    docker run --rm -d --name bmies --net elastic -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:7.16.2
+    docker run --rm -d --name bmikib --net elastic -p 5601:5601 -e "ELASTICSEARCH_HOSTS=http://bmies:9200" docker.elastic.co/kibana/kibana:7.16.2
+   
+>
+    Building the Dockerfile
+
+    docker build -t bmicalc:v1.1 -f dockerfile .
+
+>
+    Running the Flask application with all environment variables
+    docker rm -f bmicalcapp
+    docker run -d --rm --name bmicalcapp \
+        --net elastic \
+        -v /home/$USER/tests/arun-chandramouli/challenge/planA/:/tmp/bmi/ \
+        -e bmiCatJsonFile="/tmp/bmi/files/bmi_cat.json" \
+        -e bmiUsersJsonFile="/tmp/bmi/files/sample1.json" \
+        -e esHost="bmies" \
+        -e esPort="9200" \
+        -e esIndex="bmi" \
+        -e FLASKHOSTNAME="0.0.0.0" \
+        -e FLASKPORT="7777" \
+        -p 7777:7777 \
+        bmicalc:v1.1 \
+        python /tmp/bmi/source/main/driver.py
+
+
+> Run the CURL Commands for Publishing and Filtering BMI Records
+    
+    > curl -XGET http://localhost:7777/
+    > curl -XPOST http://localhost:7777/api/v1.1/bmi/publish/ # Publish records to elasticsearch server(millions of records)
+    > curl -XGET http://localhost:7777/api/v1.1/bmi/filter/ -d 'esQuery={"query": {"match": {"bmi.cat":"OverWeight"}}}'

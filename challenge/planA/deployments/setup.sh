@@ -3,14 +3,13 @@
 # Note to READER: Please ensure to have a ROOT access to run certain commands
 
 function clone_source()    
+    
     cd /home/$USER
     sudo rm -rf /home/$USER/tests/
     sudo mkdir tests
     cd tests
     sudo git clone https://github.com/arunc1985/arun-chandramouli.git
-    ls arun-chandramouli
-    cd /home/$USER
-    ls
+    ls /home/$USER/tests/arun-chandramouli
     sudo chown -R $USER /home/$USER/tests/
 
 function install_docker_engine()

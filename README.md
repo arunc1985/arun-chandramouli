@@ -102,6 +102,34 @@ ALGORITHM
 
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
+-------------------------
+CLONING THE SOURCE-CODE
+-------------------------
+>
+    echo "Clone the Source Code..."
+    cd /home/$USER
+    sudo rm -rf /home/$USER/tests/
+    sudo mkdir tests
+    cd tests
+    sudo git clone https://github.com/arunc1985/arun-chandramouli.git
+    ls /home/$USER/tests/arun-chandramouli
+
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+-------------------------------------------------
+EXECUTION STEPS - ENVIRONMENT BRINGUP AUTOMATED
+-------------------------------------------------
+
+>
+    Please run the shell file to kickoff automated environment bring-up
+    ls /home/$USER/tests/arun-chandramouli
+    cd /home/intucell/tests/arun-chandramouli/challenge/planA/deployments
+    sudo chmod 777 ./setup.sh
+    ./setup.sh
+
+
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
 -----------------------------------------------
 EXECUTION STEPS - ENVIRONMENT BRINGUP MANUALLY
 -----------------------------------------------
@@ -112,21 +140,14 @@ EXECUTION STEPS - ENVIRONMENT BRINGUP MANUALLY
     ----------------
     MANUAL EXECUTION
     ----------------
-    echo "Clone the Source Code..."
-    cd /home/$USER
-    sudo rm -rf /home/$USER/tests/
-    sudo mkdir tests
-    git clone https://github.com/arunc1985/arun-chandramouli.git
-    cd /home/$USER
-    ls
 
     echo "Install Docker Engine ... from https://docs.docker.com/engine/install/ubuntu/"
 
     sudo groupadd docker
     sudo usermod -aG docker $USER
 
-    sudo apt-get remove docker docker-engine docker.io containerd runc
-    sudo apt-get update
+    sudo apt-get remove docker docker-engine docker.io containerd runc -y
+    sudo apt-get update -y
     sudo apt-get install \
         ca-certificates \
         curl \
@@ -137,8 +158,8 @@ EXECUTION STEPS - ENVIRONMENT BRINGUP MANUALLY
     "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
       $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 
-    sudo apt-get update
-    sudo apt-get install docker-ce docker-ce-cli containerd.io
+    sudo apt-get update -y
+    sudo apt-get install docker-ce docker-ce-cli containerd.io -y
     sudo docker run hello-world
 
 
@@ -149,9 +170,14 @@ EXECUTION STEPS - ENVIRONMENT BRINGUP MANUALLY
     docker pull docker.elastic.co/kibana/kibana:7.16.2
 
     echo "Kickoff Elasticsearch & Kibana Containers"
-    docker rm -f bmies bmikib
+    docker rm -f $(docker ps -qa)
+    docker rmi -f $(docker images -qa)
+    docker volume rm -f $(docker volume ls)
+
     docker run --rm -d --name bmies --net elastic -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:7.16.2
     docker run --rm -d --name bmikib --net elastic -p 5601:5601 -e "ELASTICSEARCH_HOSTS=http://bmies:9200" docker.elastic.co/kibana/kibana:7.16.2
+    docker ps | grep 'bmies'
+    docker ps | grep 'bmikib'
 
     echo "Build the Dockerfile for processing the application ..."
 
@@ -174,6 +200,10 @@ EXECUTION STEPS - ENVIRONMENT BRINGUP MANUALLY
         bmicalc:v1.1 \
         python /tmp/bmi/source/main/driver.py
 
+    docker ps | grep 'bmicalcapp'
+
+
+    sudo chown -R $USER /home/$USER/tests/
 
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
