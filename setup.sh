@@ -2,7 +2,7 @@
 
 # Note to READER: Please ensure to have a ROOT access to run certain commands
 
-function clone_source()    
+function clone_source() {
     
     cd /home/$USER
     sudo mkdir -p tests
@@ -10,8 +10,9 @@ function clone_source()
     sudo git clone https://github.com/arunc1985/arun-chandramouli.git
     ls /home/$USER/tests/arun-chandramouli
     sudo chown -R $USER /home/$USER/tests/
+}
 
-function install_docker_engine()
+function install_docker_engine() {
 
     sudo groupadd docker
     sudo usermod -aG docker $USER
@@ -22,8 +23,9 @@ function install_docker_engine()
         ca-certificates \
         curl \
         gnupg \
-        lsb-release
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+        lsb-release  -y
+
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg -y
     echo \
     "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
       $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
@@ -33,34 +35,42 @@ function install_docker_engine()
     sudo docker run hello-world
     sudo chown -R $USER /home/$USER/tests/
 
-function docker_network_create()
+}
 
-    docker network rm elastic
-    docker network create elastic
-
-function kickoff_es_kibana()
-
-    docker pull docker.elastic.co/elasticsearch/elasticsearch:7.16.2
-    docker pull docker.elastic.co/kibana/kibana:7.16.2
+function docker_network_create() {
     docker rm -f $(docker ps -qa)
     docker rmi -f $(docker images -qa)
+    docker network rm elastic
+    docker network create elastic
+}
+
+function kickoff_es_kibana() {
+
+    docker rm -f $(docker ps -qa)
+    docker rmi -f $(docker images -qa)
+    docker pull docker.elastic.co/elasticsearch/elasticsearch:7.16.2
+    docker pull docker.elastic.co/kibana/kibana:7.16.2
     docker volume rm -f $(docker volume ls)
     docker run --rm -d --name bmies --net elastic -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:7.16.2
     docker run --rm -d --name bmikib --net elastic -p 5601:5601 -e "ELASTICSEARCH_HOSTS=http://bmies:9200" docker.elastic.co/kibana/kibana:7.16.2
     docker ps | grep 'bmies'
     docker ps | grep 'bmikib'
+}
 
-function build_bmi_docker()
+function build_bmi_docker() {
+
     sudo chown -R $USER /home/$USER/tests/
     cd /home/$USER/tests/arun-chandramouli/challenge/planA/deployments
     docker build -t bmicalc:v1.1 -f dockerfile .
+}
 
-function build_bmi_app_container()
+function build_bmi_app_container() {
     sudo chown -R $USER /home/$USER/tests/
     cd /home/$USER/tests/arun-chandramouli/challenge/planA/deployments
     docker build -t bmicalc:v1.1 -f dockerfile .
+}
 
-function run_bmi_app_container()
+function run_bmi_app_container() {
 
     docker rm -f bmicalcapp
     docker run -d --rm --name bmicalcapp \
@@ -80,12 +90,14 @@ function run_bmi_app_container()
     docker ps | grep 'bmicalcapp'
 
     sudo chown -R $USER /home/$USER/tests/
+}
 
 
-function app_rest_tests()
+function app_rest_tests() {
     curl -XGET http://localhost:7777/ 
+}
 
-function clean_install()
+function clean_install() {
     echo "Clone the Source Code..."
     clone_source
     echo "Install Docker Engine ... from https://docs.docker.com/engine/install/ubuntu/"
@@ -102,8 +114,9 @@ function clean_install()
     run_bmi_app_container
     echo "Run App tests to ensure Flask app works!"
     app_rest_tests
-
+}
 # Do a Clean Install
 clean_install
+
 
 
