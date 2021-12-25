@@ -1,8 +1,22 @@
 '''
     This module contains all the Python Utils for re-usable code.
 '''
-import json
+import json,os
 from elasticsearch import Elasticsearch, helpers
+
+
+class OSOperator:
+
+    @staticmethod
+    def return_list_files_dir(dir_path):
+        '''
+            Given a Dir Path return all the files in the directory
+            :param dir_path: Full-Path of the working directory
+            :return: All files in the directory with fullpath
+            :exception: Raise Error
+        '''
+        for each_file in os.listdir(dir_path):
+            yield os.path.join(dir_path,each_file)
 
 class JsonOperator:
 
