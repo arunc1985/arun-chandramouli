@@ -189,8 +189,8 @@ EXECUTION STEPS - ENVIRONMENT BRINGUP MANUALLY
     docker run -d --rm --name bmicalcapp \
         --net elastic \
         -v /home/$USER/tests/arun-chandramouli/challenge/planA/:/tmp/bmi/ \
-        -e bmiCatJsonFile="/tmp/bmi/files/bmi_cat.json" \
-        -e bmiUsersJsonFile="/tmp/bmi/files/sample1.json" \
+        -e bmiUsersJsonFilePath="/tmp/bmi/files/bmicategory/bmi_cat.json" \
+        -e bmiUsersJsonFile="/tmp/bmi/files/bmisamples" \
         -e esHost="bmies" \
         -e esPort="9200" \
         -e esIndex="bmi" \
