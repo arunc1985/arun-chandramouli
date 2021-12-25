@@ -53,7 +53,7 @@ class ESDataUploader(ESDataBase):
         '''
             Delete index & Push records in BULK into ElasticSearch
         '''
-        #ESOperator.deleteIndex(self.esConnObj,es_index=es_index)
+        ESOperator.deleteIndex(self.esConnObj,es_index=es_index)
         return ESOperator.bulkUploadJson(es_conn_object=self.esConnObj,es_index=es_index,json_file_contents=records)
 
 class Uploader:
@@ -69,7 +69,7 @@ class Uploader:
         es_processor_ins=ESDataUploader(esHost=esHost,esPort=esPort)
         es_processor_ins.getEsConnection()
         es_processor_ins.setRecordsBulk(es_index=esIndex,records=list(procesor_ins.getBMIValues()))
-        return True
+        return "Records Uploaded successfully. Login to Kibana http://<<IP>>:<<5601>> for details."
 
 if __name__ == "__main__":
     # Upload Records

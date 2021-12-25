@@ -26,8 +26,7 @@ class Filters:
         '''
         es_processor_ins_parser=ESDataFilter(esHost=esHost,esPort=esPort)
         es_processor_ins_parser.getEsConnection()
-        es_processor_ins_parser.getRecordsFromIndex(es_index=esIndex,query=json.loads(esQuery))
-        return True
+        return es_processor_ins_parser.getRecordsFromIndex(es_index=esIndex,query=json.loads(esQuery))
 
 if __name__ == "__main__":
 

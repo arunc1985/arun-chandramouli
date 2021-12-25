@@ -1,0 +1,18 @@
+
+
+>
+	Building the Dockerfile
+
+	docker build -t bmicalc:v1.1 -f dockerfile .
+
+>
+	Running the Flask application with all environment variables
+	docker run --rm -d \
+		-v /tmp/bmi/:/home/tests/arun-chandramouli/challenge/planA/ \
+        -e bmiCatJsonFile=/home/tests/arun-chandramouli/challenge/planA/files/bmi_cat.json \
+        -e bmiUsersJsonFile=/home/tests/arun-chandramouli/challenge/planA/files/sample1.json \
+        -e esHost=localhost \
+        -e esPort=9200 \        
+        -e esIndex='bmi' \
+        -p 7777:7777 \
+		python:3.8-slim
