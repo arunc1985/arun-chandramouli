@@ -15,3 +15,6 @@
 		git checkout setup
 		sudo apt update -y && sudo apt install dos2unix -y && sudo dos2unix ./setup.sh && sudo chmod 777 ./setup.sh
 		./setup.sh  
+	
+	Once the setup is done, please refer to the README file here: https://github.com/arunc1985/arun-chandramouli/tree/master
+	It will show you how to access Elasticsearch & Kibana, also pointers on executing REST APIs for BMIs
