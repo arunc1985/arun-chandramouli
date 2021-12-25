@@ -1,0 +1,9 @@
+[
+
+    {"cat":"UnderWeight","low":0,"high":18.4,"healthRisk":"Malnutrition risk"},
+    {"cat":"NormalWeight","low":18.5,"high":24.9,"healthRisk":"Low risk"},
+    {"cat":"OverWeight","low":25,"high":29.9,"healthRisk":"Enhanced risk"},
+    {"cat":"ModerateObese","low":30,"high":34.9,"healthRisk":"Medium risk"},
+    {"cat":"SevereObese","low":35,"high":39.9,"healthRisk":"High risk"},
+    {"cat":"VerySevereObese","low":40,"high":"","healthRisk":"Very high risk"}
+]
