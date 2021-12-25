@@ -20,15 +20,15 @@ class ESDataFilter(ESDataBase):
 class Filters:
 
     @staticmethod
-    def filter(esHost,esPort,esQuery):
+    def filter(esHost,esPort,esIndex,esQuery):
         '''
             Parse Records & Upload to Elasticsearch Index(Bulk Upload)
         '''
         es_processor_ins_parser=ESDataFilter(esHost=esHost,esPort=esPort)
         es_processor_ins_parser.getEsConnection()
-        return es_processor_ins_parser.getRecordsFromIndex(es_index=esIndex,query=json.loads(esQuery))
+        return es_processor_ins_parser.getRecordsFromIndex(es_index=esIndex,query=esQuery)
 
 if __name__ == "__main__":
 
-    Filters.filter(os.environ['esHost'],os.environ['esPort'],os.environ['ESQUERY'])
+    Filters.filter(os.environ['esHost'],os.environ['esPort'],os.environ['esIndex'])
     
