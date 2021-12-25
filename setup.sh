@@ -94,6 +94,8 @@ function run_bmi_app_container() {
 
 
 function app_rest_tests() {
+    echo "Wait for all containers to bring-up eco-system"
+    sleep 10
     curl -XGET http://localhost:7777/ 
 }
 
