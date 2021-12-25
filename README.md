@@ -6,8 +6,8 @@
 
 	Please run the following steps in an order; (You must have ROOT Access)
 
-		rm -rf /home/$USER/arun-chandramouli
-		rm -rf /home/$USER/tests
+		sudo rm -rf /home/$USER/arun-chandramouli
+		sudo rm -rf /home/$USER/tests
 		git clone https://github.com/arunc1985/arun-chandramouli.git
 		sudo chown -R $USER /home/$USER/arun-chandramouli
  		ls -la
