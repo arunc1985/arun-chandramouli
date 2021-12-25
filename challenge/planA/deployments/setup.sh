@@ -94,10 +94,15 @@ function run_bmi_app_container() {
 }
 
 
-function app_rest_tests() {
-    echo "Wait for all containers to bring-up eco-system"
+function app_rest_tests() {    
     sleep 10
     curl -XGET http://localhost:7777/ 
+}
+
+function cleanup() {    
+    
+    cd /home/$USER
+    rm -rf /home/$USER/arun-chandramouli
 }
 
 function clean_install() {
@@ -115,8 +120,11 @@ function clean_install() {
     build_bmi_app_container
     echo "Running the Flask application with all environment variables ..."
     run_bmi_app_container
+    echo "Wait for all containers to bring-up eco-system"
     echo "Run App tests to ensure Flask app works!"
     app_rest_tests
+    echo "Do cleanup"
+    cleanup
 }
 # Do a Clean Install
 clean_install
