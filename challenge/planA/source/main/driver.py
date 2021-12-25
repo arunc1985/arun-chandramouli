@@ -38,7 +38,7 @@ def publish_bmi_stats():
         Invoke module es_upload and perform all the necessary tasks.
         Send a Return code of 201 on success.
     """
-    res=Uploader.upload(os.environ['bmiUsersJsonFile'],os.environ['bmiCatJsonFile'],os.environ['esHost'],os.environ['esPort'],os.environ['esIndex'])
+    res=Uploader.parallel(os.environ['bmiUsersJsonFilePath'],os.environ['bmiCatJsonFile'],os.environ['esHost'],os.environ['esPort'],os.environ['esIndex'])
     return {200:res}
 
 

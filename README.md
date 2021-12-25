@@ -102,108 +102,42 @@ ALGORITHM
 
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
--------------------------
-CLONING THE SOURCE-CODE
--------------------------
->
-    echo "Clone the Source Code..."
-    cd /home/$USER
-    sudo rm -rf /home/$USER/tests/
-    sudo mkdir tests
-    cd tests
-    sudo git clone https://github.com/arunc1985/arun-chandramouli.git
-    ls /home/$USER/tests/arun-chandramouli
-
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-
 -------------------------------------------------
 EXECUTION STEPS - ENVIRONMENT BRINGUP AUTOMATED
 -------------------------------------------------
 
 >
     Please run the shell file to kickoff automated environment bring-up
-    ls /home/$USER/tests/arun-chandramouli
-    cd /home/intucell/tests/arun-chandramouli/challenge/planA/deployments
-    sudo chmod 777 ./setup.sh
-    ./setup.sh
 
+    SETUP PROGRAM TO BRING-UP THE ECOSYSTEM
+
+    * * * The entire set-up is automated, but you only need to clone and run setup.sh file * * *
+    Please run the following steps in an order; (You must have ROOT Access)
+
+        sudo git clone https://github.com/arunc1985/arun-chandramouli.git
+        sudo chown -R $USER /home/$USER/arun-chandramouli
+        ls -la
+        cd arun-chandramouli
+        git checkout setup
+        sudo apt update -y && sudo apt install dos2unix -y && sudo dos2unix ./setup.sh && sudo chmod 777 ./setup.sh
+        ./setup.sh  
 
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
------------------------------------------------
-EXECUTION STEPS - ENVIRONMENT BRINGUP MANUALLY
------------------------------------------------
+---------------------------------------------------------
+NOTE ON SCALING & HIGH PERFORMANCE ELASTICSEARCH CLUSTER
+---------------------------------------------------------
 
 >
-    Please run the following commands in an ORDER to bring-up Environment
+    -   I have used Elasticsearch database for all search processing to get results in very optimized manner.
+        i have made all components configurable.
+    -   To enable scaling we need to add more nodes to the system and auto-scaling can be thus enabled.
+    -   For the purpose of this exercise I have limited myself to single node.
+    -   There are some limitations w.r.t Filesize and count of records that the cluster can handle, since
+        this is a single node. 
+    -   Please be informed that Elasticsearch can be configured for high-end systems also
+        but that may not be the scope of this exercise.
 
-    ----------------
-    MANUAL EXECUTION
-    ----------------
-
-    echo "Install Docker Engine ... from https://docs.docker.com/engine/install/ubuntu/"
-
-    sudo groupadd docker
-    sudo usermod -aG docker $USER
-
-    sudo apt-get remove docker docker-engine docker.io containerd runc -y
-    sudo apt-get update -y
-    sudo apt-get install \
-        ca-certificates \
-        curl \
-        gnupg \
-        lsb-release
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-    echo \
-    "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
-      $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-
-    sudo apt-get update -y
-    sudo apt-get install docker-ce docker-ce-cli containerd.io -y
-    sudo docker run hello-world
-
-
-    echo "Create a Docker Network for maintaining all the Containers"
-    docker network rm elastic
-    docker network create elastic
-    docker pull docker.elastic.co/elasticsearch/elasticsearch:7.16.2
-    docker pull docker.elastic.co/kibana/kibana:7.16.2
-
-    echo "Kickoff Elasticsearch & Kibana Containers"
-    docker rm -f $(docker ps -qa)
-    docker rmi -f $(docker images -qa)
-    docker volume rm -f $(docker volume ls)
-
-    docker run --rm -d --name bmies --net elastic -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:7.16.2
-    docker run --rm -d --name bmikib --net elastic -p 5601:5601 -e "ELASTICSEARCH_HOSTS=http://bmies:9200" docker.elastic.co/kibana/kibana:7.16.2
-    docker ps | grep 'bmies'
-    docker ps | grep 'bmikib'
-
-    echo "Build the Dockerfile for processing the application ..."
-
-    cd /home/$USER/tests/arun-chandramouli/challenge/planA/deployments
-    docker build -t bmicalc:v1.1 -f dockerfile .
-
-    echo "Running the Flask application with all environment variables ..."
-    docker rm -f bmicalcapp
-    docker run -d --rm --name bmicalcapp \
-        --net elastic \
-        -v /home/$USER/tests/arun-chandramouli/challenge/planA/:/tmp/bmi/ \
-        -e bmiCatJsonFile="/tmp/bmi/files/bmicategory/bmi_cat.json" \
-        -e bmiUsersJsonFilePath="/tmp/bmi/files/bmisamples" \
-        -e esHost="bmies" \
-        -e esPort="9200" \
-        -e esIndex="bmi" \
-        -e FLASKHOSTNAME="0.0.0.0" \
-        -e FLASKPORT="7777" \
-        -p 7777:7777 \
-        bmicalc:v1.1 \
-        python /tmp/bmi/source/main/driver.py
-
-    docker ps | grep 'bmicalcapp'
-
-
-    sudo chown -R $USER /home/$USER/tests/
 
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 

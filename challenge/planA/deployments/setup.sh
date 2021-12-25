@@ -40,6 +40,7 @@ function install_docker_engine() {
 function docker_network_create() {
     docker rm -f $(docker ps -qa)
     docker rmi -f $(docker images -qa)
+    docker volume rm -f $(docker volume ls)
     docker network rm elastic
     docker network create elastic
 }

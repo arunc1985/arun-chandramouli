@@ -87,17 +87,19 @@ class Uploader:
            If you wish to process many millions of records then we will have to fine tune Elasticsearch configuration
            which may not be scope of this exercise. 
         '''
-        # Return the list of files
-        list_files=list(OSOperator.return_list_files_dir(dir_path))
-        threads=[]
-        for each_file in list_files:
-            file_thread = threading.Thread(target=cls.upload, args=(each_file,bmiCatJsonFile,esHost,esPort,esIndex))
-            threads.append(file_thread)
-            file_thread.start()
-        for _thread_ in threads:
-            _thread_.join()
-
-        return list_files
+        try:
+            # Return the list of files
+            list_files=list(OSOperator.return_list_files_dir(dir_path))
+            threads=[]
+            for each_file in list_files:
+                file_thread = threading.Thread(target=cls.upload, args=(each_file,bmiCatJsonFile,esHost,esPort,esIndex))
+                threads.append(file_thread)
+                file_thread.start()
+            for _thread_ in threads:
+                _thread_.join()
+            return "Files Uploaded successfully to Elasticsearch. Login to Kibana http://<<IP>>:<<5601>> for details. Files are .. " + ','.join(list_files)
+        except Exception as error:
+            raise Exception("Unable to process BMI files in parallel. Files Path - {} ".format(dir_path))
 
 if __name__ == "__main__":
     '''
