@@ -5,8 +5,7 @@
 function clone_source()    
     
     cd /home/$USER
-    sudo rm -rf /home/$USER/tests/
-    sudo mkdir tests
+    sudo mkdir -p tests
     cd tests
     sudo git clone https://github.com/arunc1985/arun-chandramouli.git
     ls /home/$USER/tests/arun-chandramouli
